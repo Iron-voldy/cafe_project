@@ -69,7 +69,7 @@ const Home = () => {
                                 <strong>CafeSync</strong> provides a unified cloud platform that bridges front-of-house operations with back-office analytics to improve efficiency, accuracy, and customer satisfaction globally.
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {['Real-time Cloud Sync', 'Automated POS System', 'Smart Inventory Forecasting', 'Frictionless Online Booking'].map((item, i) => (
+                                {['Real-time Order Tracking', 'Integrated Billing', 'Inventory Management', 'Table Reservations'].map((item, i) => (
                                     <motion.div key={i} initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="flex items-center gap-3">
                                         <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                             <FaCheck className="text-green-600 text-[12px]" />
@@ -92,22 +92,22 @@ const Home = () => {
                                 <div className="space-y-6 relative z-10 mt-6">
                                     <div className="flex justify-between items-end border-b border-amber-700/50 pb-4">
                                         <div>
-                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Average Revenue Increase</p>
-                                            <p className="text-3xl font-extrabold">+24%</p>
+                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Order Processing</p>
+                                            <p className="text-3xl font-extrabold">Instant</p>
                                         </div>
                                         <FaDollarSign className="text-amber-400 text-2xl mb-1" />
                                     </div>
                                     <div className="flex justify-between items-end border-b border-amber-700/50 pb-4">
                                         <div>
-                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Order Error Reduction</p>
-                                            <p className="text-3xl font-extrabold">-85%</p>
+                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Menu & Stock Tracking</p>
+                                            <p className="text-3xl font-extrabold">Live</p>
                                         </div>
                                         <FaChartLine className="text-amber-400 text-2xl mb-1" />
                                     </div>
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Staff Time Saved</p>
-                                            <p className="text-3xl font-extrabold">12hrs/wk</p>
+                                            <p className="text-amber-200/80 text-xs font-medium uppercase tracking-wider mb-1">Table Management</p>
+                                            <p className="text-3xl font-extrabold">Easy</p>
                                         </div>
                                         <FaUsers className="text-amber-400 text-2xl mb-1" />
                                     </div>
@@ -121,8 +121,8 @@ const Home = () => {
                                         <FaGlobe size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-bold text-gray-900">500+</p>
-                                        <p className="text-xs text-gray-500 font-medium">Global Locations</p>
+                                        <p className="text-2xl font-bold text-gray-900">4</p>
+                                        <p className="text-xs text-gray-500 font-medium">Core Modules</p>
                                     </div>
                                 </div>
                                 <div className="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
@@ -130,8 +130,8 @@ const Home = () => {
                                         <FaUsers size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-bold text-gray-900">2.5M</p>
-                                        <p className="text-xs text-gray-500 font-medium">Orders Processed</p>
+                                        <p className="text-2xl font-bold text-gray-900">24/7</p>
+                                        <p className="text-xs text-gray-500 font-medium">System Availability</p>
                                     </div>
                                 </div>
                             </div>

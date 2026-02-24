@@ -20,8 +20,9 @@ const Login = () => {
         setError('');
         setLoading(true);
         try {
-            await login(email, password);
-            navigate('/dashboard');
+            const result = await login(email, password);
+            // customers go to home page, admin/staff go to dashboard
+            navigate(result.user?.role === 'customer' ? '/' : '/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {

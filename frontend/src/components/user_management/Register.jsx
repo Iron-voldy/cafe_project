@@ -107,15 +107,7 @@ const Register = () => {
                         </div>
                     </div>
 
-                    {/* role selection */}
-                    <div className="mb-4">
-                        <label className="block text-warm/80 text-sm font-medium mb-1">Role</label>
-                        <select name="role" value={formData.role} onChange={handleChange} className="w-full px-3 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-secondary transition-all text-sm appearance-none cursor-pointer">
-                            <option value="customer" style={{ background: '#2D1B0E', color: '#FFF8F0' }}>Customer</option>
-                            <option value="staff" style={{ background: '#2D1B0E', color: '#FFF8F0' }}>Staff</option>
-                            <option value="admin" style={{ background: '#2D1B0E', color: '#FFF8F0' }}>Admin</option>
-                        </select>
-                    </div>
+                    {/* role is always customer for public registration */}
 
                     {/* password fields */}
                     <div className="mb-4">

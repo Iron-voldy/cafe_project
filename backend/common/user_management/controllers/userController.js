@@ -111,4 +111,33 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-module.exports = { register, login, getProfile, updateProfile, getAllUsers };
+// update user (admin only) - change role, active status, etc.
+const updateUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { firstName, lastName, phone, role, isActive } = req.body;
+        await user.update({ firstName, lastName, phone, role, isActive });
+        res.json({ message: 'User updated successfully', user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, phone: user.phone, isActive: user.isActive } });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// delete user (admin only)
+const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        await user.destroy();
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { register, login, getProfile, updateProfile, getAllUsers, updateUser, deleteUser };

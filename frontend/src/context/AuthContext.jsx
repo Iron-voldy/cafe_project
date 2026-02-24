@@ -52,11 +52,18 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
+    // update user data (for profile edits)
+    const updateUser = (updatedData) => {
+        const newUser = { ...user, ...updatedData };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
+    };
+
     // check if user is authenticated
     const isAuthenticated = !!token;
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

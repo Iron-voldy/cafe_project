@@ -4,12 +4,13 @@ const router = express.Router();
 const { createMenuItem, getAllMenuItems, getMenuItemById, updateMenuItem, deleteMenuItem } = require('../controllers/menuItemController');
 const { createStock, getAllStock, getStockById, updateStock, deleteStock, getLowStockAlerts } = require('../controllers/stockController');
 const { authMiddleware } = require('../../middleware/auth');
+const upload = require('../../middleware/upload');
 
 // menu item routes - full CRUD
-router.post('/items', authMiddleware, createMenuItem);
+router.post('/items', authMiddleware, upload.single('image'), createMenuItem);
 router.get('/items', getAllMenuItems);
 router.get('/items/:id', getMenuItemById);
-router.put('/items/:id', authMiddleware, updateMenuItem);
+router.put('/items/:id', authMiddleware, upload.single('image'), updateMenuItem);
 router.delete('/items/:id', authMiddleware, deleteMenuItem);
 
 // stock routes - full CRUD

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { register, login, getProfile, updateProfile, getAllUsers } = require('../controllers/userController');
+const { register, login, getProfile, updateProfile, getAllUsers, updateUser, deleteUser } = require('../controllers/userController');
 const { authMiddleware, adminMiddleware } = require('../../../middleware/auth');
 
 // register route with validation
@@ -25,7 +25,29 @@ router.get('/profile', authMiddleware, getProfile);
 // update profile (authenticated)
 router.put('/profile', authMiddleware, updateProfile);
 
-// get all users (admin only)
-router.get('/all', authMiddleware, adminMiddleware, getAllUsers);
+// get all users (admin and staff)
+router.get('/all', authMiddleware, (req, res, next) => {
+    if (req.user.role === 'admin' || req.user.role === 'staff') return next();
+    return res.status(403).json({ message: 'Not authorized' });
+}, getAllUsers);
+
+// delete own account (authenticated user)
+router.delete('/profile', authMiddleware, async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findByPk(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        await user.destroy();
+        res.json({ message: 'Account deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// update user (admin only)
+router.put('/:id', authMiddleware, adminMiddleware, updateUser);
+
+// delete user (admin only)
+router.delete('/:id', authMiddleware, adminMiddleware, deleteUser);
 
 module.exports = router;

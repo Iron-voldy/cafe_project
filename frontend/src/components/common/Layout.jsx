@@ -11,7 +11,8 @@ import {
     FaBars,
     FaTimes,
     FaUserCircle,
-    FaCoffee
+    FaCoffee,
+    FaUser
 } from 'react-icons/fa';
 
 const Layout = ({ children }) => {
@@ -29,10 +30,14 @@ const Layout = ({ children }) => {
     // We assume backend roles: admin, staff, customer
     const navLinks = [
         { name: 'Dashboard', path: '/dashboard', icon: <FaHome />, roles: ['admin', 'staff', 'customer'] },
-        { name: 'Orders', path: '/orders', icon: <FaClipboardList />, roles: ['admin', 'staff', 'customer'] },
+        { name: 'Orders', path: '/orders', icon: <FaClipboardList />, roles: ['admin', 'staff'] },
         { name: 'Payments', path: '/payments', icon: <FaMoneyBillWave />, roles: ['admin', 'staff'] },
         { name: 'Menu & Inventory', path: '/menu', icon: <FaBookOpen />, roles: ['admin', 'staff'] },
-        { name: 'Table Reservations', path: '/tables', icon: <FaChair />, roles: ['admin', 'staff', 'customer'] },
+        { name: 'Table Reservations', path: '/tables', icon: <FaChair />, roles: ['admin', 'staff'] },
+        { name: 'Staff', path: '/staff', icon: <FaUserCircle />, roles: ['admin'] },
+        { name: 'My Orders', path: '/orders', icon: <FaClipboardList />, roles: ['customer'] },
+        { name: 'Reservations', path: '/tables', icon: <FaChair />, roles: ['customer'] },
+        { name: 'Profile', path: '/profile', icon: <FaUser />, roles: ['admin', 'staff', 'customer'] },
     ];
 
     // Filter links based on current user's role
@@ -47,8 +52,8 @@ const Layout = ({ children }) => {
                 to={path}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                        ? 'bg-amber-100 text-amber-900 shadow-sm border-l-4 border-amber-600'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-amber-700'
+                    ? 'bg-amber-100 text-amber-900 shadow-sm border-l-4 border-amber-600'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-amber-700'
                     }`}
             >
                 <div className={`text-xl ${isActive ? 'text-amber-600' : 'text-gray-400'}`}>

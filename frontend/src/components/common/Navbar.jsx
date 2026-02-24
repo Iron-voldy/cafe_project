@@ -1,4 +1,4 @@
-// compact navbar with 64px height, hover underline, profile dropdown
+// compact navbar with 64px height, hover underline, profile dropdown — role-aware
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,8 +12,8 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const profileRef = useRef(null);
+    const isCustomer = user?.role === 'customer';
 
-    // close profile dropdown on outside click
     useEffect(() => {
         const handler = (e) => {
             if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
@@ -29,42 +29,38 @@ const Navbar = () => {
         setProfileOpen(false);
     };
 
-    const navLinks = [
-        { path: '/', label: 'Home' },
-        { path: '/dashboard', label: 'Dashboard' },
-        { path: '/orders', label: 'Orders' },
-        { path: '/menu', label: 'Menu' },
-        { path: '/tables', label: 'Tables' },
-        { path: '/payments', label: 'Payments' }
-    ];
+    // role-based nav links
+    const getNavLinks = () => {
+        const links = [{ path: '/', label: 'Home' }];
+        links.push({ path: '/browse-menu', label: 'Menu' });
+        if (isAuthenticated) {
+            links.push({ path: isCustomer ? '/reservations' : '/tables', label: 'Reservations' });
+            if (!isCustomer) {
+                links.push({ path: '/dashboard', label: 'Dashboard' });
+            }
+        }
+        return links;
+    };
 
+    const navLinks = getNavLinks();
     const isActive = (path) => location.pathname === path;
 
     return (
         <nav className="bg-amber-900 shadow-lg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-[64px]">
-                    {/* logo */}
                     <Link to="/" className="flex items-center gap-2 shrink-0">
                         <FaCoffee className="text-amber-600 text-xl" />
                         <span className="text-lg font-bold text-amber-600 tracking-tight">CafeSync</span>
                     </Link>
 
-                    {/* desktop nav links */}
+                    {/* desktop nav */}
                     <div className="hidden md:flex items-center gap-1">
                         {navLinks.map((link) => (
-                            <Link
-                                key={link.path}
-                                to={link.path}
-                                className={`relative px-3 py-1.5 rounded-md text-[13px] font-medium transition-all duration-200 group ${isActive(link.path)
-                                    ? 'text-amber-600'
-                                    : 'text-warm/70 hover:text-white'
-                                    }`}
-                            >
+                            <Link key={link.path} to={link.path}
+                                className={`relative px-3 py-1.5 rounded-md text-[13px] font-medium transition-all duration-200 group ${isActive(link.path) ? 'text-amber-600' : 'text-warm/70 hover:text-white'}`}>
                                 {link.label}
-                                {/* underline indicator */}
-                                <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-amber-600 rounded-full transition-all duration-300 ${isActive(link.path) ? 'w-4/5' : 'w-0 group-hover:w-3/5'
-                                    }`} />
+                                <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-amber-600 rounded-full transition-all duration-300 ${isActive(link.path) ? 'w-4/5' : 'w-0 group-hover:w-3/5'}`} />
                             </Link>
                         ))}
                     </div>
@@ -73,10 +69,7 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center gap-2 shrink-0">
                         {isAuthenticated ? (
                             <div className="relative" ref={profileRef}>
-                                <button
-                                    onClick={() => setProfileOpen(!profileOpen)}
-                                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                                >
+                                <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                                     <div className="w-7 h-7 rounded-full bg-amber-600/20 border border-secondary/40 flex items-center justify-center">
                                         <FaUser className="text-amber-600 text-xs" />
                                     </div>
@@ -84,24 +77,23 @@ const Navbar = () => {
                                     <FaChevronDown className={`text-warm/50 text-xs transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
-                                {/* profile dropdown */}
                                 <AnimatePresence>
                                     {profileOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="absolute right-0 top-full mt-1.5 w-48 bg-dark border border-white/15 rounded-xl shadow-2xl overflow-hidden z-50"
-                                        >
+                                        <motion.div initial={{ opacity: 0, y: 5, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 5, scale: 0.95 }} transition={{ duration: 0.15 }}
+                                            className="absolute right-0 top-full mt-1.5 w-48 bg-dark border border-white/15 rounded-xl shadow-2xl overflow-hidden z-50">
                                             <div className="px-3.5 py-3 border-b border-white/10">
                                                 <p className="text-white text-sm font-medium">{user?.firstName} {user?.lastName}</p>
                                                 <p className="text-warm/50 text-xs mt-0.5">{user?.email}</p>
                                             </div>
                                             <div className="py-1.5">
-                                                <Link to="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-warm/70 hover:text-white hover:bg-white/5 text-[13px] transition-colors">
-                                                    <FaCog size={13} /> Settings
+                                                <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-warm/70 hover:text-white hover:bg-white/5 text-[13px] transition-colors">
+                                                    <FaUser size={13} /> My Profile
                                                 </Link>
+                                                {!isCustomer && (
+                                                    <Link to="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-warm/70 hover:text-white hover:bg-white/5 text-[13px] transition-colors">
+                                                        <FaCog size={13} /> Dashboard
+                                                    </Link>
+                                                )}
                                                 <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 text-[13px] transition-colors cursor-pointer">
                                                     <FaSignOutAlt size={13} /> Logout
                                                 </button>
@@ -128,13 +120,8 @@ const Navbar = () => {
             {/* mobile menu */}
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="md:hidden bg-dark border-t border-white/10 overflow-hidden"
-                    >
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
+                        className="md:hidden bg-dark border-t border-white/10 overflow-hidden">
                         <div className="px-4 py-2.5 space-y-0.5">
                             {navLinks.map((link) => (
                                 <Link key={link.path} to={link.path} onClick={() => setIsOpen(false)}
@@ -144,6 +131,7 @@ const Navbar = () => {
                             <div className="pt-2 mt-2 border-t border-white/10">
                                 {isAuthenticated ? (
                                     <>
+                                        <Link to="/profile" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm text-amber-600 font-medium">My Profile</Link>
                                         <div className="px-3 py-2 text-amber-600 text-sm flex items-center gap-2">
                                             <FaUser size={14} /> {user?.firstName} {user?.lastName}
                                         </div>

@@ -65,14 +65,14 @@ const HeroSection = () => {
                     {/* stats */}
                     <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                         {[
-                            { label: 'Orders', value: '500+', icon: FaShoppingCart },
-                            { label: 'Menu Items', value: '120+', icon: FaCoffee },
-                            { label: 'Tables', value: '50+', icon: FaCalendarAlt },
-                            { label: 'Revenue', value: 'LKR 2M+', icon: FaDollarSign }
+                            { label: 'Order Tracking', value: 'Live', icon: FaShoppingCart },
+                            { label: 'Menu Control', value: 'Full', icon: FaCoffee },
+                            { label: 'Reservations', value: 'Easy', icon: FaCalendarAlt },
+                            { label: 'Payments', value: 'Secure', icon: FaDollarSign }
                         ].map(({ label, value, icon: Icon }, i) => (
                             <motion.div key={i} whileHover={{ scale: 1.04, y: -3 }} className="bg-white/90 backdrop-blur-md border border-white border-t border-l shadow-xl rounded-xl p-4 text-center">
                                 <Icon className="text-amber-600 text-lg mx-auto mb-1.5" />
-                                <p className="text-xl font-bold text-white">{value}</p>
+                                <p className="text-xl font-bold text-amber-900">{value}</p>
                                 <p className="text-warm/50 text-xs">{label}</p>
                             </motion.div>
                         ))}

@@ -4,7 +4,8 @@ const MenuItem = require('../models/MenuItem');
 // create a new menu item
 const createMenuItem = async (req, res) => {
     try {
-        const { name, description, category, price, image, isAvailable, preparationTime } = req.body;
+        const { name, description, category, price, isAvailable, preparationTime } = req.body;
+        const image = req.file ? `/uploads/menu/${req.file.filename}` : (req.body.image || null);
         // check if item name already exists
         const existing = await MenuItem.findOne({ where: { name } });
         if (existing) {
@@ -56,7 +57,8 @@ const updateMenuItem = async (req, res) => {
         if (!menuItem) {
             return res.status(404).json({ message: 'Menu item not found' });
         }
-        const { name, description, category, price, image, isAvailable, preparationTime } = req.body;
+        const { name, description, category, price, isAvailable, preparationTime } = req.body;
+        const image = req.file ? `/uploads/menu/${req.file.filename}` : (req.body.image || menuItem.image);
         // update menu item
         await menuItem.update({ name, description, category, price, image, isAvailable, preparationTime });
         res.json({ message: 'Menu item updated successfully', menuItem });
