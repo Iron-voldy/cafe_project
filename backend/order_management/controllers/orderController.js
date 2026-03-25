@@ -1,6 +1,18 @@
 // Order controller - Gihen (IT24103788) - CRUD operations for orders
+const { body, validationResult } = require('express-validator');
 const Order = require('../models/Order');
 const OrderItem = require('../models/OrderItem');
+const MenuItem = require('../../menu_inventory_management/models/MenuItem');
+
+// validation rules for create order
+const validateOrder = [
+    body('customerName').trim().notEmpty().withMessage('Customer name is required'),
+    body('orderType').isIn(['dine-in', 'takeaway', 'online']).withMessage('Invalid order type'),
+    body('tableNumber').optional().isInt({ min: 1 }).withMessage('Table number must be a positive integer'),
+    body('items').optional().isArray().withMessage('Items must be an array'),
+    body('items.*.quantity').optional().isInt({ min: 1 }).withMessage('Item quantity must be at least 1'),
+    body('items.*.unitPrice').optional().isFloat({ min: 0 }).withMessage('Unit price must be a positive number'),
+];
 
 // generate unique order number
 const generateOrderNumber = () => {
@@ -11,38 +23,36 @@ const generateOrderNumber = () => {
 
 // create a new order
 const createOrder = async (req, res) => {
+    // run express-validator checks
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
     try {
         const { customerName, orderType, tableNumber, notes, items } = req.body;
-        // generate unique order number
         const orderNumber = generateOrderNumber();
-        // calculate total from items
-        let totalAmount = 0;
+        // resolve each item — if menuItemId provided, fetch name + price from DB
+        let resolvedItems = [];
         if (items && items.length > 0) {
-            totalAmount = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+            for (const item of items) {
+                let resolvedName = item.itemName;
+                let resolvedPrice = parseFloat(item.unitPrice);
+                if (item.menuItemId) {
+                    const menuItem = await MenuItem.findByPk(item.menuItemId);
+                    if (!menuItem) return res.status(404).json({ message: `Menu item not found: ID ${item.menuItemId}` });
+                    resolvedName = menuItem.name;
+                    resolvedPrice = parseFloat(menuItem.price);
+                }
+                resolvedItems.push({ menuItemId: item.menuItemId || null, itemName: resolvedName, quantity: parseInt(item.quantity), unitPrice: resolvedPrice, totalPrice: parseInt(item.quantity) * resolvedPrice, specialInstructions: item.specialInstructions || null });
+            }
         }
-        // create the order
+        const totalAmount = resolvedItems.reduce((s, i) => s + i.totalPrice, 0);
         const order = await Order.create({
-            orderNumber,
-            customerId: req.user?.id || null,
-            customerName,
-            orderType,
-            tableNumber,
-            totalAmount,
-            notes
+            orderNumber, customerId: req.user?.id || null, customerName,
+            orderType, tableNumber: orderType === 'dine-in' ? (tableNumber || null) : null,
+            totalAmount, notes
         });
-        // create order items if provided
-        if (items && items.length > 0) {
-            const orderItems = items.map(item => ({
-                orderId: order.id,
-                itemName: item.itemName,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                totalPrice: item.quantity * item.unitPrice,
-                specialInstructions: item.specialInstructions || null
-            }));
-            await OrderItem.bulkCreate(orderItems);
+        if (resolvedItems.length > 0) {
+            await OrderItem.bulkCreate(resolvedItems.map(i => ({ ...i, orderId: order.id })));
         }
-        // fetch complete order with items
         const completeOrder = await Order.findByPk(order.id, { include: [{ model: OrderItem, as: 'items' }] });
         res.status(201).json({ message: 'Order created successfully', order: completeOrder });
     } catch (error) {
@@ -109,4 +119,4 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, getAllOrders, getOrderById, updateOrder, deleteOrder };
+module.exports = { validateOrder, createOrder, getAllOrders, getOrderById, updateOrder, deleteOrder };

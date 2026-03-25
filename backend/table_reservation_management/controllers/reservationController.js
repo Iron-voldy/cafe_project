@@ -42,14 +42,16 @@ const createReservation = async (req, res) => {
 // get all reservations
 const getAllReservations = async (req, res) => {
     try {
-        // support status and date filter
+        // support filtering by status, date, customer email/phone
         const whereClause = {};
         if (req.query.status) whereClause.status = req.query.status;
         if (req.query.date) whereClause.reservationDate = req.query.date;
+        if (req.query.email) whereClause.customerEmail = req.query.email;
+        if (req.query.phone) whereClause.customerPhone = req.query.phone;
         const reservations = await Reservation.findAll({
             where: whereClause,
             include: [{ model: Table, as: 'table' }],
-            order: [['reservationDate', 'ASC'], ['reservationTime', 'ASC']]
+            order: [['reservationDate', 'DESC'], ['reservationTime', 'ASC']]
         });
         res.json(reservations);
     } catch (error) {

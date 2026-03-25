@@ -15,6 +15,12 @@ const OrderItem = sequelize.define('OrderItem', {
         allowNull: false,
         references: { model: 'orders', key: 'id' }
     },
+    menuItemId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'menu_items', key: 'id' },
+        comment: 'FK to menu_items — optional for custom/unlisted items'
+    },
     itemName: {
         type: DataTypes.STRING(100),
         allowNull: false

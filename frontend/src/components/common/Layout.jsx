@@ -1,19 +1,9 @@
+// futuristic dark sidebar layout
 import { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import {
-    FaHome,
-    FaClipboardList,
-    FaMoneyBillWave,
-    FaBookOpen,
-    FaChair,
-    FaSignOutAlt,
-    FaBars,
-    FaTimes,
-    FaUserCircle,
-    FaCoffee,
-    FaUser
-} from 'react-icons/fa';
+import { FaRightFromBracket, FaBars, FaXmark, FaMugHot, FaUser } from 'react-icons/fa6';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -26,124 +16,223 @@ const Layout = ({ children }) => {
         navigate('/login');
     };
 
-    // Define navigation links based on user roles
-    // We assume backend roles: admin, staff, customer
     const navLinks = [
-        { name: 'Dashboard', path: '/dashboard', icon: <FaHome />, roles: ['admin', 'staff', 'customer'] },
-        { name: 'Orders', path: '/orders', icon: <FaClipboardList />, roles: ['admin', 'staff'] },
-        { name: 'Payments', path: '/payments', icon: <FaMoneyBillWave />, roles: ['admin', 'staff'] },
-        { name: 'Menu & Inventory', path: '/menu', icon: <FaBookOpen />, roles: ['admin', 'staff'] },
-        { name: 'Table Reservations', path: '/tables', icon: <FaChair />, roles: ['admin', 'staff'] },
-        { name: 'Staff', path: '/staff', icon: <FaUserCircle />, roles: ['admin'] },
-        { name: 'My Orders', path: '/orders', icon: <FaClipboardList />, roles: ['customer'] },
-        { name: 'Reservations', path: '/tables', icon: <FaChair />, roles: ['customer'] },
-        { name: 'Profile', path: '/profile', icon: <FaUser />, roles: ['admin', 'staff', 'customer'] },
+        { name: 'Dashboard',         path: '/dashboard', icon: 'fa-gauge',         roles: ['admin', 'staff', 'customer'] },
+        { name: 'Orders',            path: '/orders',    icon: 'fa-cart-shopping',  roles: ['admin', 'staff'] },
+        { name: 'Billing & Payments',path: '/payments',  icon: 'fa-credit-card',    roles: ['admin', 'staff'] },
+        { name: 'Menu & Inventory',  path: '/menu',      icon: 'fa-book-open',      roles: ['admin', 'staff'] },
+        { name: 'Table Reservations',path: '/tables',    icon: 'fa-chair',          roles: ['admin', 'staff'] },
+        { name: 'Staff',             path: '/staff',     icon: 'fa-users',          roles: ['admin'] },
+        { name: 'My Orders',         path: '/orders',    icon: 'fa-bag-shopping',   roles: ['customer'] },
+        { name: 'Reservations',      path: '/tables',    icon: 'fa-calendar-check', roles: ['customer'] },
+        { name: 'My Profile',        path: '/profile',   icon: 'fa-user',           roles: ['admin', 'staff', 'customer'] },
     ];
 
-    // Filter links based on current user's role
     const filteredLinks = navLinks.filter(link =>
         !user || !link.roles || link.roles.includes(user.role || 'customer')
     );
 
+    const sidebarBg = {
+        background: 'linear-gradient(180deg, #08111f 0%, #070b14 100%)',
+        borderRight: '1px solid rgba(0,229,255,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+    };
+
     const NavItem = ({ name, path, icon }) => {
-        const isActive = location.pathname === path;
+        const active = location.pathname === path;
         return (
-            <NavLink
-                to={path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                    ? 'bg-amber-100 text-amber-900 shadow-sm border-l-4 border-amber-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-amber-700'
-                    }`}
-            >
-                <div className={`text-xl ${isActive ? 'text-amber-600' : 'text-gray-400'}`}>
-                    {icon}
-                </div>
-                <span className="font-medium">{name}</span>
+            <NavLink to={path} onClick={() => setIsMobileMenuOpen(false)}
+                style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '0.7rem 1rem', borderRadius: 8,
+                    fontSize: '0.82rem', fontWeight: 500,
+                    marginBottom: 2, position: 'relative',
+                    transition: 'all 0.2s',
+                    color: active ? '#00e5ff' : 'rgba(107,132,176,0.9)',
+                    background: active ? 'rgba(0,229,255,0.08)' : 'transparent',
+                    border: active ? '1px solid rgba(0,229,255,0.18)' : '1px solid transparent',
+                    borderLeft: active ? '3px solid #00e5ff' : '3px solid transparent',
+                    boxShadow: active ? '0 0 14px rgba(0,229,255,0.08)' : 'none',
+                }}>
+                <i className={`fa-solid ${icon}`} style={{ fontSize: 13, minWidth: 16, color: active ? '#00e5ff' : 'rgba(107,132,176,0.7)' }}></i>
+                <span>{name}</span>
+                {active && (
+                    <span style={{
+                        marginLeft: 'auto',
+                        width: 5, height: 5, borderRadius: '50%',
+                        background: '#00e5ff',
+                        boxShadow: '0 0 6px #00e5ff',
+                    }} />
+                )}
             </NavLink>
         );
     };
 
+    const roleLabel = { admin: 'Administrator', staff: 'Staff Member', customer: 'Customer' };
+
     return (
-        <div className="flex h-screen bg-gray-50 font-sans overflow-hidden text-gray-800">
-            {/* Mobile Sidebar Overlay */}
-            {isMobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-20 lg:hidden"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
-            )}
+        <div style={{ display: 'flex', height: '100vh', background: '#070b14', overflow: 'hidden', fontFamily: "'Inter', sans-serif" }}>
+
+            {/* Mobile overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, background: 'rgba(7,11,20,0.8)', backdropFilter: 'blur(4px)', zIndex: 20 }}
+                        onClick={() => setIsMobileMenuOpen(false)} />
+                )}
+            </AnimatePresence>
 
             {/* Sidebar */}
-            <aside
-                className={`fixed lg:static inset-y-0 left-0 z-30 w-72 bg-white shadow-xl lg:shadow-md transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-                    }`}
-            >
-                <div className="flex items-center justify-between h-20 px-6 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-amber-600 rounded-lg text-white">
-                            <FaCoffee className="text-2xl" />
+            <AnimatePresence>
+                <aside style={{
+                    ...sidebarBg,
+                    width: 256,
+                    position: 'fixed',
+                    top: 0, bottom: 0, left: isMobileMenuOpen ? 0 : undefined,
+                    zIndex: 30,
+                    transform: isMobileMenuOpen ? 'translateX(0)' : undefined,
+                }}
+                    className="lg:static lg:translate-x-0 flex-col"
+                    id="main-sidebar"
+                >
+                    {/* Sidebar Header */}
+                    <div style={{ padding: '1.25rem 1.25rem 1rem', borderBottom: '1px solid rgba(0,229,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{
+                                width: 36, height: 36, borderRadius: 8,
+                                background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(245,158,11,0.15))',
+                                border: '1px solid rgba(0,229,255,0.3)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <FaMugHot style={{ color: '#00e5ff', fontSize: 16 }} />
+                            </div>
+                            <div>
+                                <span style={{
+                                    fontFamily: "'Rajdhani', sans-serif",
+                                    fontSize: '1.15rem', fontWeight: 700,
+                                    background: 'linear-gradient(90deg, #00e5ff, #f59e0b)',
+                                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                                    letterSpacing: '0.04em', display: 'block',
+                                }}>CafeSync</span>
+                                <span style={{ fontSize: '0.65rem', color: 'rgba(0,229,255,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Management</span>
+                            </div>
                         </div>
-                        <span className="text-2xl font-bold bg-gradient-to-r from-amber-700 to-amber-500 bg-clip-text text-transparent">
-                            CafeSync
-                        </span>
+                        <button onClick={() => setIsMobileMenuOpen(false)}
+                            style={{ color: '#6b84b0', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+                            className="lg:hidden">
+                            <FaXmark size={18} />
+                        </button>
                     </div>
-                    <button
-                        className="lg:hidden text-gray-400 hover:text-gray-600"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        <FaTimes className="text-2xl" />
-                    </button>
-                </div>
 
-                <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-2 custom-scrollbar">
-                    {filteredLinks.map((link) => (
-                        <NavItem key={link.name} {...link} />
-                    ))}
-                </nav>
-
-                <div className="p-4 border-t border-gray-100">
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl mb-4">
-                        <FaUserCircle className="text-3xl text-amber-600" />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">
-                                {user ? `${user.firstName} ${user.lastName}` : 'Guest User'}
-                            </p>
-                            <p className="text-xs text-gray-500 capitalize truncate">
-                                {user?.role || 'customer'}
-                            </p>
+                    {/* Role Badge */}
+                    <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid rgba(0,229,255,0.05)' }}>
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '0.25rem 0.6rem', borderRadius: 99,
+                            background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.18)',
+                            fontSize: '0.68rem', fontWeight: 600, color: '#00e5ff',
+                            letterSpacing: '0.08em', textTransform: 'uppercase',
+                        }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00e5ff', boxShadow: '0 0 6px #00e5ff', display: 'inline-block' }} />
+                            {roleLabel[user?.role] || 'User'}
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                        <FaSignOutAlt />
-                        <span>Sign Out</span>
-                    </button>
-                </div>
-            </aside>
+                    {/* Nav Links */}
+                    <nav style={{ flex: 1, overflowY: 'auto', padding: '0.75rem' }}>
+                        <div style={{ fontSize: '0.62rem', fontWeight: 700, color: '#3d5278', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.4rem 0.5rem 0.75rem' }}>
+                            Navigation
+                        </div>
+                        {filteredLinks.map((link) => (
+                            <NavItem key={link.name} {...link} />
+                        ))}
+                    </nav>
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                {/* Header (Mobile Only for Sidebar Toggle, Desktop for actions/profile if needed) */}
-                <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:justify-end shadow-sm z-10">
-                    <button
-                        className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                        onClick={() => setIsMobileMenuOpen(true)}
-                    >
-                        <FaBars className="text-2xl" />
+                    {/* User Footer */}
+                    <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(0,229,255,0.08)' }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '0.75rem', borderRadius: 10, marginBottom: 8,
+                            background: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.08)',
+                        }}>
+                            <div style={{
+                                width: 34, height: 34, borderRadius: '50%',
+                                background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(245,158,11,0.15))',
+                                border: '1px solid rgba(0,229,255,0.25)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                            }}>
+                                <FaUser style={{ color: '#00e5ff', fontSize: 13 }} />
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                                <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#c2d3f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
+                                </p>
+                                <p style={{ fontSize: '0.68rem', color: '#3d5278', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {user?.email}
+                                </p>
+                            </div>
+                        </div>
+                        <button onClick={handleLogout}
+                            style={{
+                                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                padding: '0.6rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600,
+                                color: '#ef4444', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
+                                cursor: 'pointer', transition: 'all 0.2s',
+                            }}
+                            className="hover:bg-[rgba(239,68,68,0.12)] hover:border-[rgba(239,68,68,0.35)]">
+                            <FaRightFromBracket style={{ fontSize: 13 }} />
+                            Sign Out
+                        </button>
+                    </div>
+                </aside>
+            </AnimatePresence>
+
+            {/* Main Content */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden', marginLeft: 256 }} className="lg:ml-0">
+                {/* Top Header */}
+                <header style={{
+                    height: 56,
+                    background: 'rgba(7,11,20,0.9)',
+                    backdropFilter: 'blur(12px)',
+                    borderBottom: '1px solid rgba(0,229,255,0.08)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '0 1.5rem',
+                    position: 'sticky', top: 0, zIndex: 10,
+                }}>
+                    <button onClick={() => setIsMobileMenuOpen(true)}
+                        style={{
+                            color: '#6b84b0', background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.12)',
+                            borderRadius: 6, padding: '0.35rem 0.5rem', cursor: 'pointer',
+                        }}
+                        className="lg:hidden">
+                        <FaBars size={18} />
                     </button>
 
-                    <div className="flex items-center gap-4">
-                        {/* Empty space for future header actions (notifications, etc) */}
+                    <div className="hidden lg:flex items-center gap-2">
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', display: 'inline-block' }} />
+                        <span style={{ fontSize: '0.72rem', color: '#6b84b0', letterSpacing: '0.06em' }}>SYSTEM ONLINE</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontSize: '0.78rem', fontWeight: 600, color: '#c2d3f0' }}>{user?.firstName} {user?.lastName}</p>
+                            <p style={{ fontSize: '0.65rem', color: '#3d5278', textTransform: 'capitalize' }}>{user?.role}</p>
+                        </div>
+                        <div style={{
+                            width: 32, height: 32, borderRadius: '50%',
+                            background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(245,158,11,0.15))',
+                            border: '1px solid rgba(0,229,255,0.25)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                            <FaUser style={{ color: '#00e5ff', fontSize: 12 }} />
+                        </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-                    <div className="max-w-7xl mx-auto">
+                <main style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', background: '#070b14' }} className="hud-grid">
+                    <div style={{ maxWidth: 1280, margin: '0 auto' }}>
                         {children}
                     </div>
                 </main>

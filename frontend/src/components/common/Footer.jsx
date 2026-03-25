@@ -1,51 +1,143 @@
-// slim compact footer — hidden on login/register via prop
+// futuristic dark footer
 import { Link, useLocation } from 'react-router-dom';
-import { FaCoffee, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMugHot, FaEnvelope, FaPhone, FaLocationDot, FaGithub, FaLinkedin } from 'react-icons/fa6';
 
 const Footer = () => {
     const location = useLocation();
-    // hide footer on auth pages
-    if (['/login', '/register'].includes(location.pathname)) return null;
+    if (['/login', '/register', '/admin'].includes(location.pathname)) return null;
 
     return (
-        <footer className="bg-amber-900 text-warm/60 mt-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* brand */}
+        <footer style={{
+            background: 'rgba(8,13,24,0.95)',
+            borderTop: '1px solid rgba(0,229,255,0.08)',
+            position: 'relative',
+            overflow: 'hidden',
+        }}>
+            {/* top glow line */}
+            <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(0,229,255,0.4), rgba(245,158,11,0.3), transparent)' }} />
+
+            {/* bg decoration */}
+            <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 300, background: 'radial-gradient(ellipse, rgba(0,229,255,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem 1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+
+                    {/* Brand */}
                     <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <FaCoffee className="text-amber-600 text-lg" />
-                            <span className="text-base font-bold text-amber-600">CafeSync</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '0.75rem' }}>
+                            <div style={{
+                                width: 32, height: 32, borderRadius: 8,
+                                background: 'rgba(0,229,255,0.1)',
+                                border: '1px solid rgba(0,229,255,0.25)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <FaMugHot style={{ color: '#00e5ff', fontSize: 14 }} />
+                            </div>
+                            <span style={{
+                                fontFamily: "'Rajdhani', sans-serif",
+                                fontSize: '1.15rem', fontWeight: 700,
+                                background: 'linear-gradient(90deg, #00e5ff, #f59e0b)',
+                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                                letterSpacing: '0.04em',
+                            }}>CafeSync</span>
                         </div>
-                        <p className="text-xs leading-relaxed max-w-xs">
-                            Modern cafe management system designed to streamline operations, enhance customer experience, and boost efficiency.
+                        <p style={{ fontSize: '0.78rem', color: '#3d5278', lineHeight: 1.7, maxWidth: 220 }}>
+                            Next-generation cafe management platform. Streamline every operation from a single unified dashboard.
                         </p>
+                        <div style={{ display: 'flex', gap: 8, marginTop: '1rem' }}>
+                            {[FaGithub, FaLinkedin].map((Icon, i) => (
+                                <div key={i} style={{
+                                    width: 30, height: 30, borderRadius: 6,
+                                    background: 'rgba(0,229,255,0.06)',
+                                    border: '1px solid rgba(0,229,255,0.12)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer', transition: 'all 0.2s',
+                                }}
+                                    className="hover:border-[rgba(0,229,255,0.4)] hover:bg-[rgba(0,229,255,0.12)]">
+                                    <Icon style={{ color: '#6b84b0', fontSize: 13 }} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* quick links */}
+                    {/* Quick Links */}
                     <div>
-                        <h3 className="text-amber-600 font-semibold mb-3 text-sm">Quick Links</h3>
-                        <ul className="space-y-1.5 text-xs">
-                            <li><Link to="/dashboard" className="hover:text-amber-600 transition-colors">Dashboard</Link></li>
-                            <li><Link to="/menu" className="hover:text-amber-600 transition-colors">Menu Management</Link></li>
-                            <li><Link to="/orders" className="hover:text-amber-600 transition-colors">Order Tracking</Link></li>
-                            <li><Link to="/tables" className="hover:text-amber-600 transition-colors">Reservations</Link></li>
+                        <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: '#00e5ff', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>Quick Links</h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {[
+                                { to: '/dashboard', label: 'Dashboard' },
+                                { to: '/browse-menu', label: 'Browse Menu' },
+                                { to: '/orders', label: 'Order Tracking' },
+                                { to: '/tables', label: 'Reservations' },
+                            ].map(({ to, label }) => (
+                                <li key={to}>
+                                    <Link to={to}
+                                        style={{ fontSize: '0.8rem', color: '#3d5278', display: 'flex', alignItems: 'center', gap: 6, transition: 'color 0.15s' }}
+                                        className="hover:text-[#00e5ff]">
+                                        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9, color: 'rgba(0,229,255,0.4)' }}></i>
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* contact */}
+                    {/* System */}
                     <div>
-                        <h3 className="text-amber-600 font-semibold mb-3 text-sm">Contact Us</h3>
-                        <ul className="space-y-2 text-xs">
-                            <li className="flex items-center gap-2"><FaMapMarkerAlt className="text-amber-600 shrink-0" size={13} /> Malabe, Sri Lanka</li>
-                            <li className="flex items-center gap-2"><FaPhone className="text-amber-600 shrink-0" size={13} /> +94 11 234 5678</li>
-                            <li className="flex items-center gap-2"><FaEnvelope className="text-amber-600 shrink-0" size={13} /> info@cafesync.lk</li>
+                        <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: '#00e5ff', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>System</h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {[
+                                { to: '/menu', label: 'Menu Management' },
+                                { to: '/payments', label: 'Billing & Payments' },
+                                { to: '/staff', label: 'Staff Management' },
+                                { to: '/login', label: 'Admin Login' },
+                            ].map(({ to, label }) => (
+                                <li key={label}>
+                                    <Link to={to}
+                                        style={{ fontSize: '0.8rem', color: '#3d5278', display: 'flex', alignItems: 'center', gap: 6, transition: 'color 0.15s' }}
+                                        className="hover:text-[#00e5ff]">
+                                        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9, color: 'rgba(0,229,255,0.4)' }}></i>
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Contact */}
+                    <div>
+                        <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: '#00e5ff', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>Contact</h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            {[
+                                { icon: FaLocationDot, text: 'Malabe, Sri Lanka' },
+                                { icon: FaPhone, text: '+94 11 234 5678' },
+                                { icon: FaEnvelope, text: 'info@cafesync.lk' },
+                            ].map(({ icon: Icon, text }, i) => (
+                                <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem', color: '#3d5278' }}>
+                                    <div style={{
+                                        width: 24, height: 24, borderRadius: 5,
+                                        background: 'rgba(0,229,255,0.06)',
+                                        border: '1px solid rgba(0,229,255,0.12)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                    }}>
+                                        <Icon style={{ color: '#00e5ff', fontSize: 10 }} />
+                                    </div>
+                                    {text}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 mt-6 pt-4 text-center text-xs text-amber-900-light/40">
-                    <p>&copy; {new Date().getFullYear()} CafeSync SaaS Solutions. All rights reserved.</p>
+                {/* Bottom Bar */}
+                <div style={{ borderTop: '1px solid rgba(0,229,255,0.07)', paddingTop: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <p style={{ fontSize: '0.73rem', color: '#3d5278' }}>
+                        &copy; {new Date().getFullYear()} CafeSync Management System. All rights reserved.
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', display: 'inline-block' }} />
+                        <span style={{ fontSize: '0.7rem', color: '#3d5278' }}>All systems operational</span>
+                    </div>
                 </div>
             </div>
         </footer>

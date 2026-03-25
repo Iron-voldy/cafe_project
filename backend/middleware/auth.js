@@ -2,21 +2,31 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// verify token middleware
+// verify token middleware — blocks unauthenticated requests
 const authMiddleware = (req, res, next) => {
     try {
-        // get token from header
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) {
             return res.status(401).json({ message: 'Access denied. No token provided.' });
         }
-        // verify token and attach user to request
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {
         return res.status(401).json({ message: 'Invalid or expired token.' });
     }
+};
+
+// optional auth — attaches user if token present, but allows unauthenticated requests through
+const optionalAuth = (req, res, next) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (token) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = decoded;
+        }
+    } catch (_) { /* ignore invalid tokens */ }
+    next();
 };
 
 // admin role check middleware
@@ -28,4 +38,4 @@ const adminMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = { authMiddleware, adminMiddleware };
+module.exports = { authMiddleware, optionalAuth, adminMiddleware };

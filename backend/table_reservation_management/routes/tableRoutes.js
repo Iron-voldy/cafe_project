@@ -13,7 +13,7 @@ router.put('/tables/:id', authMiddleware, updateTable);
 router.delete('/tables/:id', authMiddleware, deleteTable);
 
 // reservation routes - full CRUD
-router.post('/reservations', authMiddleware, createReservation);
+router.post('/reservations', createReservation);
 router.get('/reservations', getAllReservations);
 router.get('/reservations/:id', getReservationById);
 router.put('/reservations/:id', authMiddleware, updateReservation);
